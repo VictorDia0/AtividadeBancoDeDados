@@ -116,8 +116,8 @@ DELIMITER ;
 -- -----------------------------------------------------
 DELIMITER $$
 
-CREATE FUNCTION encontrar_clientes_inativos()
-RETURNS TEXT
+CREATE FUNCTION clientesInativos()
+RETURNS TEXT DETERMINISTIC
 BEGIN
     DECLARE clientes_inativos TEXT;
     
@@ -142,8 +142,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE FUNCTION analise_mensal_vendas(mes INT, ano INT)
-RETURNS TEXT
+CREATE FUNCTION analise_mensal(mes INT, ano INT)
+RETURNS TEXT DETERMINISTIC
 BEGIN
     DECLARE total_vendas DECIMAL;
     DECLARE num_clientes INT;
@@ -170,7 +170,7 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE FUNCTION encontrar_maiores_compradores()
-RETURNS TEXT
+RETURNS TEXT DETERMINISTIC
 BEGIN
     DECLARE maiores_compradores TEXT;
     
