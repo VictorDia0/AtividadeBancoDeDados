@@ -1,3 +1,7 @@
+-- -----------------------------------------------------
+-- Questao 01 --
+-- -----------------------------------------------------
+
 DELIMITER $$
 create function TotalVendas(inicio DATE, fim DATE) 
 returns DECIMAL DETERMINISTIC
@@ -21,6 +25,7 @@ DELIMITER ;
 select TotalVendas('2009-11-03', '2009-11-30');
 
 -- -----------------------------------------------------
+-- Questao 02 --
 -- -----------------------------------------------------
 
 
@@ -48,7 +53,9 @@ DELIMITER ;
 
 select Media(11,2009);
 
+
 -- -----------------------------------------------------
+-- Questao 03 --
 -- -----------------------------------------------------
 
 DELIMITER $$
@@ -78,7 +85,10 @@ DELIMITER ;
 
 select maisVendido(2009);
 
+
+
 -- -----------------------------------------------------
+-- Questao 04 --
 -- -----------------------------------------------------
 
 
@@ -94,6 +104,76 @@ BEGIN
     WHERE p.codcliente = id_cliente;
 
     RETURN valor_medio;
+END;
+$$
+
+DELIMITER ;
+
+
+
+-- -----------------------------------------------------
+-- Questao 05 --
+-- -----------------------------------------------------
+DELIMITER $$
+
+CREATE FUNCTION encontrar_clientes_inativos()
+RETURNS TEXT
+BEGIN
+    DECLARE clientes_inativos TEXT;
+    
+    SELECT GROUP_CONCAT(codcliente) INTO clientes_inativos
+    FROM cliente c
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM pedido p
+        WHERE p.codcliente = c.codcliente AND p.data >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+    );
+
+    RETURN clientes_inativos;
+END;
+$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE FUNCTION analise_mensal_vendas(mes INT, ano INT)
+RETURNS TEXT
+BEGIN
+    DECLARE total_vendas DECIMAL;
+    DECLARE num_clientes INT;
+    DECLARE media_por_cliente DECIMAL;
+    
+    SELECT SUM(p.valor), COUNT(DISTINCT p.codcliente), SUM(p.valor) / COUNT(DISTINCT p.codcliente)
+    INTO total_vendas, num_clientes, media_por_cliente
+    FROM pedido p
+    WHERE MONTH(p.data) = mes AND YEAR(p.data) = ano;
+
+    RETURN CONCAT('Total de Vendas: ', total_vendas,
+                  '\nNúmero de Clientes Únicos: ', num_clientes,
+                  '\nMédia de Vendas por Cliente: ', media_por_cliente);
+END;
+$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE FUNCTION encontrar_maiores_compradores()
+RETURNS TEXT
+BEGIN
+    DECLARE maiores_compradores TEXT;
+    
+    SELECT GROUP_CONCAT(c.nome) INTO maiores_compradores
+    FROM cliente c
+    JOIN pedido p ON c.codcliente = p.codcliente
+    GROUP BY c.codcliente
+    ORDER BY SUM(p.valor) DESC
+    LIMIT 3;
+
+    RETURN maiores_compradores;
 END;
 $$
 
